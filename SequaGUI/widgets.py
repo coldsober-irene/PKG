@@ -210,7 +210,7 @@ class btn(Button):
         self.level = level
         self.COLOR = focus_color
         self.reset_anchors = reset_anchors
-        self.reset_level = self.reset_level
+        self.reset_level = reset_level
         prev_color = 'gray90'
         # configure save button
         if 'save' in str(self['text']).lower():
