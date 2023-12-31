@@ -6,9 +6,9 @@ setup(
 
     # Packages to include into the distribution
     packages=find_packages(), 
-    version='0.0.3',
+    version='0.0.4',
     license='',
-    description='Advanced button',
+    description='Advanced button continuation',
     long_description = open('README.md').read(),
     long_description_context_type = 'text/markdown',
     author='Sequa Inc', 

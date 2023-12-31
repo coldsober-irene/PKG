@@ -199,15 +199,18 @@ class treeview(ttk.Treeview):
 
 class btn(Button):
     levels_track = {}
-    def __init__(self, master,image = None, focus_color = '#F875AA',level:int = 1, **kwargs):
+    def __init__(self, master,image = None, focus_color = '#F875AA',level:int = 1, reset_anchors = False, reset_level = None,**kwargs):
         """
         - level: this is the level of child compared to the parent such that you can see which button clicked and 
         its parent stays highlighted
         - focus_color: foreground color to be configured to the button after it was anchored (clicked)
+        - reset_anchors (bool, optional): if set to True, this button once clicked will reset anchors to start
         """
         super().__init__(master=master, compound = "left", bd = 0,font = w(12),image = image, **kwargs)
         self.level = level
         self.COLOR = focus_color
+        self.reset_anchors = reset_anchors
+        self.reset_level = self.reset_level
         prev_color = 'gray90'
         # configure save button
         if 'save' in str(self['text']).lower():
@@ -301,7 +304,20 @@ class btn(Button):
         self.bind('<Leave>', lambda e: self.config(bg = prev_color))
         btn.levels_track.setdefault(self.level, [])
         self.bind('<Button-1>', lambda e: self.__setColor__(), add = '+')
-    
+        self.bind('<Button-1>', lambda e: self.__reset__(), add = '+')
+
+    def __reset__(self):
+        if self.reset_anchors:
+            if self.reset_level:
+                btn.levels_track[self.reset_level] = []
+                btn.levels_track[self.level].append((self, self.cget('fg')))
+                self.config(fg = self.COLOR)
+            else:
+                btn.levels_track = {}
+                btn.levels_track.setdefault(self.level, [])
+                btn.levels_track[self.level].append((self, self.cget('fg')))
+                self.config(fg = self.COLOR)
+
     def __setColor__(self):
         btn.levels_track.setdefault(self.level, [])
         if self.level in list(btn.levels_track.keys()):
