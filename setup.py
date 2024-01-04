@@ -6,9 +6,9 @@ setup(
 
     # Packages to include into the distribution
     packages=find_packages(), 
-    version='0.0.4',
+    version='0.0.6',
     license='',
-    description='Advanced button continuation',
+    description='Advanced Combobox with searching built-in',
     long_description = open('README.md').read(),
     long_description_context_type = 'text/markdown',
     author='Sequa Inc', 

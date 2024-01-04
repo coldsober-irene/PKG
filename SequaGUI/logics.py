@@ -268,8 +268,9 @@ class Sql_database:
 class Make_thread:
     def __init__(self, target) -> None:
         self.target = target
-        self.run_thread()
-    def run_thread(self):
+        self.__run_thread__()
+
+    def __run_thread__(self):
         t = Thread(target = self.target)
         t.start()
         

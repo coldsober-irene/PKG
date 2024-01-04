@@ -12,6 +12,12 @@ from textwrap import wrap
 from screeninfo import get_monitors
 from threading import Thread
 import atexit
+from copy import deepcopy
+
+
+__win__ = Tk() # FOR TESTING
+__win__.state('zoomed')
+root_of_app = None # Tk() of the whole app
 
 def get_extended_screen_size():
     # Get the list of all connected screens
@@ -199,7 +205,7 @@ class treeview(ttk.Treeview):
 
 class btn(Button):
     levels_track = {}
-    def __init__(self, master,image = None, focus_color = '#F875AA',level:int = 1, reset_anchors = False, reset_level = None,**kwargs):
+    def __init__(self, master,image = None, focus_color = '#FFA500',level:int = 1, reset_anchors = False, reset_level = None,**kwargs):
         """
         - level: this is the level of child compared to the parent such that you can see which button clicked and 
         its parent stays highlighted
@@ -214,7 +220,7 @@ class btn(Button):
         prev_color = 'gray90'
         # configure save button
         if 'save' in str(self['text']).lower():
-            self.config(bg = "#FF9", fg = "#fff", image = image)
+            self.config(bg = "#c90076", fg = "#fff", image = image)
             prev_color = self.cget('bg')
         
         elif 'edit' in str(self['text']).lower():
@@ -500,8 +506,17 @@ class entry(Entry):
 
 #=====================COMBOBOX=======================
 class combo(ttk.Combobox):
-    def __init__(self, master, label_txt = None, label_side = LEFT,bd_color = "#0b4", default = None, **kwargs):
+    def __init__(self, master, label_txt = None, label_side = LEFT,
+                 bd_color = "#0b4", default = None,x = 0, y = 0, width = 50, **kwargs):
         super().__init__(master, font = ('arial', w(12)),**kwargs)
+        self.x = x
+        self.y = y
+        self.width = width
+        self.original_data = deepcopy(self['values'])
+        self.var = StringVar()
+        self.config(textvariable=self.var)
+        # self.var.trace('w', self.__update_combobox__)
+        self.bind('<KeyRelease>', self.__update_combobox__)
         self.master = master
         self.st = ttk.Style()
         self.st.theme_use('clam')
@@ -528,6 +543,49 @@ class combo(ttk.Combobox):
                 self.set(default)
                 self.bind("<Button-1>", lambda e: remove_default())
                 self.bind("<Leave>", lambda e: set_default())
+    
+
+    def __update_combobox__(self, *args):
+        # Get the current text
+        text = self.var.get()
+        print("TEXT : ", text)
+        # Filter the values
+        filtered_values = [value for value in self.original_data if text in str(value)]
+        
+        # Update the values in the combobox
+        self['values'] = filtered_values
+        print("TEXT : ", text)
+        print("FOUND : ", filtered_values)
+        # Create a listbox if it doesn't exist
+        global listbox
+        if 'listbox' not in globals():
+            print(f"CORDINATES : {self.x}-----{self.y}")
+            listbox =  Listbox(root_of_app)
+            listbox.place(x = self.x, y = self.y, width = w(self.width), height = h(100))
+            listbox.bind('<<ListboxSelect>>', self.__on_select__)
+
+        # Clear the listbox
+        listbox.delete(0, END)
+
+        # Display the filtered values in the listbox
+        for value in filtered_values:
+            listbox.insert(END, value)
+
+    def __on_select__(self, event):
+        # Get the selected item
+        if listbox.curselection():
+            # Get the selected item
+            selected = listbox.get(listbox.curselection())
+
+            # Set the selected item as the combobox value
+            self.var.set(selected)
+
+            # Destroy the listbox
+            listbox.destroy()
+            del globals()['listbox']
+
+        
+
 
     
 class checkb(ttk.Checkbutton):
@@ -1113,3 +1171,15 @@ def wrapped_text(text:str, wrap_length = 20):
 comb_style = 'comb.TCombobox'
 check_style = "TCheckbutton"
 radio_style = "Custom.TRadiobutton"
+
+
+if __name__ == "__main__":
+    # FOR TEST
+    root_of_app = __win__
+    c = combo(__win__, values = ['irene', 'sober', 'fud', 'sequa'])
+    c.pack()
+    __win__.update()
+    c.x = c.winfo_x()
+    c.y = c.winfo_y() + h(12 * 2)
+    c.width = c.winfo_width()
+    __win__.mainloop() 
