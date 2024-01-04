@@ -520,7 +520,6 @@ class combo(ttk.Combobox):
         self.master = master
         self.st = ttk.Style()
         self.st.theme_use('clam')
-        
         self.st.configure('comb.TCombobox', foreground = "#023", fieldbackground = self.master['bg'],
                             bordercolor = bd_color, background = bd_color)
         try:
@@ -544,25 +543,31 @@ class combo(ttk.Combobox):
                 self.bind("<Button-1>", lambda e: remove_default())
                 self.bind("<Leave>", lambda e: set_default())
     
+    def update_widget_location(self):
+        root_of_app.update()
+        self.x = self.winfo_x()
+        self.y = self.winfo_y() + h(12 * 2)
+        self.width = self.winfo_width()
 
     def __update_combobox__(self, *args):
         # Get the current text
         text = self.var.get()
-        print("TEXT : ", text)
         # Filter the values
         filtered_values = [value for value in self.original_data if text in str(value)]
         
         # Update the values in the combobox
         self['values'] = filtered_values
-        print("TEXT : ", text)
-        print("FOUND : ", filtered_values)
         # Create a listbox if it doesn't exist
         global listbox
         if 'listbox' not in globals():
-            print(f"CORDINATES : {self.x}-----{self.y}")
-            listbox =  Listbox(root_of_app)
+            listbox =  Listbox(root_of_app, bd = 0, activestyle='dotbox',
+                               highlightbackground='#900',
+                               highlightcolor='#900',
+                               highlightthickness=1,
+                               font=('arial', w(12)))
             listbox.place(x = self.x, y = self.y, width = w(self.width), height = h(100))
             listbox.bind('<<ListboxSelect>>', self.__on_select__)
+            listbox.bind('<Return>', self.__on_select__, add = '+')
 
         # Clear the listbox
         listbox.delete(0, END)
@@ -1178,8 +1183,5 @@ if __name__ == "__main__":
     root_of_app = __win__
     c = combo(__win__, values = ['irene', 'sober', 'fud', 'sequa'])
     c.pack()
-    __win__.update()
-    c.x = c.winfo_x()
-    c.y = c.winfo_y() + h(12 * 2)
-    c.width = c.winfo_width()
+    c.update_widget_location()
     __win__.mainloop() 
