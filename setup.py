@@ -6,7 +6,7 @@ setup(
 
     # Packages to include into the distribution
     packages=find_packages(), 
-    version='0.0.6',
+    version='0.0.8',
     license='',
     description='Advanced Combobox with searching built-in',
     long_description = open('README.md').read(),

@@ -15,8 +15,6 @@ import atexit
 from copy import deepcopy
 
 
-__win__ = Tk() # FOR TESTING
-__win__.state('zoomed')
 root_of_app = None # Tk() of the whole app
 
 def get_extended_screen_size():
@@ -445,6 +443,8 @@ class EntryBtns:
     def __activate__(self):
         self.save.config(state = NORMAL)
         # RESET THE PRE-SAVED DATA FOR THESE CORRESPONDING WIDGET
+        """
+        """
         try:
             del self.saved_data_holder[int(self.ent_id.get())]
             self.entry_tags.remove(int(self.ent_id.get()))
@@ -548,12 +548,13 @@ class combo(ttk.Combobox):
         self.x = self.winfo_x()
         self.y = self.winfo_y() + h(12 * 2)
         self.width = self.winfo_width()
+        print("x = {}, y = {}, width = {}".format(self.x, self.y, self.width))
 
     def __update_combobox__(self, *args):
         # Get the current text
         text = self.var.get()
         # Filter the values
-        filtered_values = [value for value in self.original_data if text in str(value)]
+        filtered_values = [value for value in self.original_data if text.lower() in str(value).lower()]
         
         # Update the values in the combobox
         self['values'] = filtered_values
@@ -1152,7 +1153,7 @@ class DisplayTable:
         """Nothing done here yet! maybe in next versions"""
         pass
 
-def get_parent(widget, root_of_app):
+def get_parent(widget):
     """
     - widget: widget you want to get its parent
     - root_of_app: Tk window of the entire app such as root.
@@ -1180,6 +1181,9 @@ radio_style = "Custom.TRadiobutton"
 
 if __name__ == "__main__":
     # FOR TEST
+    
+    __win__ = Tk() # FOR TESTING
+    __win__.state('zoomed')
     root_of_app = __win__
     c = combo(__win__, values = ['irene', 'sober', 'fud', 'sequa'])
     c.pack()
